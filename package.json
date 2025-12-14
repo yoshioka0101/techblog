@@ -4,9 +4,9 @@
   "description": "Technical blog repository",
   "private": true,
   "scripts": {
-    "lint": "markdownlint-cli2 '**/*.md' '#node_modules'",
-    "lint:fix": "markdownlint-cli2 --fix '**/*.md' '#node_modules'",
-    "check:links": "find . -name '*.md' -not -path './node_modules/*' -not -path './.git/*' | xargs -I {} markdown-link-check {} --config .github/workflows/link-checker-config.json",
+    "lint": "markdownlint-cli2 '**/*.md'",
+    "lint:fix": "markdownlint-cli2 --fix '**/*.md'",
+    "check:links": "find . -name '*.md' -not -path './node_modules/*' -not -path './.git/*' -not -path './templates/*' -not -name 'README.md' | xargs -I {} markdown-link-check {} --config .github/workflows/link-checker-config.json",
     "validate": "bash scripts/validate-articles.sh",
     "test": "npm run lint && npm run validate"
   },

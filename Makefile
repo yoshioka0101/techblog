@@ -24,30 +24,34 @@ install: ## 必要なツールをインストール
 	npm install --save-dev markdownlint-cli2 markdown-link-check
 	@echo "$(GREEN)✅ Tools installed successfully!$(RESET)"
 
-lint: ## Markdownファイルのlintチェック
-	@echo "$(CYAN)Running markdown lint...$(RESET)"
+lint: ## Markdownファイルのlintチェック（記事のみ）
+	@echo "$(CYAN)Running markdown lint on articles...$(RESET)"
 	@if command -v npx &> /dev/null; then \
-		npx markdownlint-cli2 "**/*.md" "#node_modules" || exit 1; \
+		npx markdownlint-cli2 "**/*.md" || exit 1; \
 		echo "$(GREEN)✅ Markdown lint passed!$(RESET)"; \
 	else \
 		echo "$(RED)Error: npx not found. Run 'make install' first.$(RESET)"; \
 		exit 1; \
 	fi
 
-fix: ## Markdownファイルの自動修正
+fix: ## Markdownファイルの自動修正（記事のみ）
 	@echo "$(CYAN)Fixing markdown files...$(RESET)"
 	@if command -v npx &> /dev/null; then \
-		npx markdownlint-cli2 --fix "**/*.md" "#node_modules" || true; \
+		npx markdownlint-cli2 --fix "**/*.md" || true; \
 		echo "$(GREEN)✅ Markdown files fixed!$(RESET)"; \
 	else \
 		echo "$(RED)Error: npx not found. Run 'make install' first.$(RESET)"; \
 		exit 1; \
 	fi
 
-link-check: ## リンク切れチェック
-	@echo "$(CYAN)Checking links...$(RESET)"
+link-check: ## リンク切れチェック（記事のみ）
+	@echo "$(CYAN)Checking links in articles...$(RESET)"
 	@if command -v npx &> /dev/null; then \
-		find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | \
+		find . -name "*.md" \
+			-not -path "./node_modules/*" \
+			-not -path "./.git/*" \
+			-not -path "./templates/*" \
+			-not -name "README.md" | \
 		xargs -I {} npx markdown-link-check {} --config .github/workflows/link-checker-config.json || true; \
 		echo "$(GREEN)✅ Link check completed!$(RESET)"; \
 	else \

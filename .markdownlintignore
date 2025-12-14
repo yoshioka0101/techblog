@@ -1,0 +1,12 @@
+# Exclude README files
+README.md
+*/README.md
+
+# Exclude templates
+templates/
+
+# Exclude node_modules
+node_modules/
+
+# Exclude git directory
+.git/
