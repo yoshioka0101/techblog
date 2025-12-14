@@ -1,0 +1,22 @@
+{
+  "name": "techblog",
+  "version": "1.0.0",
+  "description": "Technical blog repository",
+  "private": true,
+  "scripts": {
+    "lint": "markdownlint-cli2 '**/*.md' '#node_modules'",
+    "lint:fix": "markdownlint-cli2 --fix '**/*.md' '#node_modules'",
+    "check:links": "find . -name '*.md' -not -path './node_modules/*' -not -path './.git/*' | xargs -I {} markdown-link-check {} --config .github/workflows/link-checker-config.json",
+    "validate": "bash scripts/validate-articles.sh",
+    "test": "npm run lint && npm run validate"
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "^0.13.0",
+    "markdown-link-check": "^3.12.2"
+  },
+  "keywords": [
+    "blog",
+    "technical-writing",
+    "documentation"
+  ]
+}

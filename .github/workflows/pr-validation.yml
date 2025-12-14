@@ -1,0 +1,74 @@
+name: PR Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            **/*.md
+
+      - name: Validate article format
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "Changed markdown files:"
+          echo "${{ steps.changed-files.outputs.all_changed_files }}"
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            if [[ "$file" == golang/*.md ]] || [[ "$file" == cicd/*.md ]] || [[ "$file" == infrastructure/*.md ]] || [[ "$file" == ai/*.md ]]; then
+              # テンプレートやREADME以外のファイルをチェック
+              if [[ "$file" != *"README.md"* ]] && [[ "$file" != *"template"* ]]; then
+                echo "Checking article: $file"
+
+                # ファイル名が YYYY-MM-DD-*.md の形式かチェック
+                filename=$(basename "$file")
+                if [[ ! "$filename" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-.*\.md$ ]]; then
+                  echo "❌ Error: Article filename must follow YYYY-MM-DD-title.md format: $file"
+                  exit 1
+                fi
+
+                # Front Matterが存在するかチェック
+                if ! grep -q "^---" "$file"; then
+                  echo "⚠️  Warning: Article should have front matter: $file"
+                fi
+
+                echo "✅ $file is valid"
+              fi
+            fi
+          done
+
+          echo "✅ All articles are valid"
+
+      - name: Check for required sections
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            if [[ "$file" == golang/*.md ]] || [[ "$file" == cicd/*.md ]] || [[ "$file" == infrastructure/*.md ]] || [[ "$file" == ai/*.md ]]; then
+              if [[ "$file" != *"README.md"* ]] && [[ "$file" != *"template"* ]]; then
+                echo "Checking sections in: $file"
+
+                # 基本的なセクションの存在確認
+                if ! grep -q "^## " "$file"; then
+                  echo "⚠️  Warning: Article should have sections (##): $file"
+                fi
+              fi
+            fi
+          done
+
+          echo "✅ Section check completed"
+
+      - name: PR validation completed
+        run: |
+          echo "✅ PR validation completed successfully"
